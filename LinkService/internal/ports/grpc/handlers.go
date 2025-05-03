@@ -23,3 +23,7 @@ func urlToLinkResponse(url string) *LinkResponse {
 func (s *Server) GenerateLink(ctx context.Context, req *LinkRequest) (*LinkResponse, error) {
 	return urlToLinkResponse(req.Url), nil
 }
+
+func (s *Server) RedirectLink(ctx context.Context, req *LinkRequest) (*LinkResponse, error) {
+	return urlToLinkResponse(req.Url), nil
+}
