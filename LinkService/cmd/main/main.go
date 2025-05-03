@@ -2,6 +2,7 @@ package main
 
 import (
 	"LinkTransformer/internal/adapters/repository"
+	"LinkTransformer/internal/app"
 	grpcPort "LinkTransformer/internal/ports/grpc"
 	"context"
 	"fmt"
@@ -10,8 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"pg-course/pkg/postgres"
-
+	"github.com/jackc/pgx/v5/pgxpool"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -22,22 +22,18 @@ func main() {
 	logger.SetLevel(log.InfoLevel)
 	logger.SetFormatter(&log.TextFormatter{})
 
-	pgConfig := postgres.Config{
-		Host:     "localhost",
-		Port:     5433,
-		Database: "pg_course",
-		User:     "postgres",
-		Password: "postgres",
-		MaxConns: 3,
-		MinConns: 1,
-	}
-
-	postgresPool, err := postgres.NewPool(pgConfig, logger)
+	config, err := pgxpool.ParseConfig("postgres://postgres:postgres@localhost:5433/pg_course")
 	if err != nil {
-		logger.WithError(err).Fatal("can't create postgres pool")
+		logger.WithError(err).Fatalf("can't parse pgxpool config")
 	}
 
-	repo := repository.NewRepository(postgresPool, logger)
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		logger.WithError(err).Fatalf("can't create new pool")
+	}
+
+	repo := repository.NewRepository(pool, logger)
+	a := app.NewApp(repo)
 
 	sigQuit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)
@@ -57,7 +53,7 @@ func main() {
 		fmt.Printf("can't create listener: %s\n", err.Error())
 		return
 	}
-	grpcServer := grpcPort.NewGRPCServer()
+	grpcServer := grpcPort.NewGRPCServer(a)
 
 	eg.Go(func() error {
 		fmt.Println("starting GRPC server")

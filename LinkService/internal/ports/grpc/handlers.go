@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"LinkTransformer/internal/app"
 	context "context"
 
 	"google.golang.org/grpc"
@@ -8,10 +9,11 @@ import (
 
 type Server struct {
 	UnimplementedLinkServiceServer
+	app app.App
 }
 
-func Register(gRPC *grpc.Server) {
-	RegisterLinkServiceServer(gRPC, &Server{})
+func Register(gRPC *grpc.Server, app app.App) {
+	RegisterLinkServiceServer(gRPC, &Server{app: app})
 }
 
 func urlToLinkResponse(url string) *LinkResponse {

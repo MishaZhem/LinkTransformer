@@ -1,11 +1,13 @@
 package grpc
 
 import (
+	"LinkTransformer/internal/app"
+
 	"google.golang.org/grpc"
 )
 
-func NewGRPCServer() *grpc.Server {
+func NewGRPCServer(app app.App) *grpc.Server {
 	server := grpc.NewServer()
-	Register(server)
+	Register(server, app)
 	return server
 }
