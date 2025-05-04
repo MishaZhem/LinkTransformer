@@ -3,8 +3,11 @@ package grpc
 import (
 	"LinkTransformer/internal/app"
 	context "context"
+	"errors"
 
 	"google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 type Server struct {
@@ -23,9 +26,28 @@ func urlToLinkResponse(url string) *LinkResponse {
 }
 
 func (s *Server) GenerateLink(ctx context.Context, req *LinkRequest) (*LinkResponse, error) {
-	return urlToLinkResponse(req.Url), nil
+	url, err := s.app.GenerateLink(ctx, req.Url)
+	if err != nil {
+		return nil, status.Error(getStatusByError(err), err.Error())
+	}
+	return urlToLinkResponse(url), nil
 }
 
 func (s *Server) RedirectLink(ctx context.Context, req *LinkRequest) (*LinkResponse, error) {
-	return urlToLinkResponse(req.Url), nil
+	url, err := s.app.RedirectLink(ctx, req.Url)
+	if err != nil {
+		return nil, status.Error(getStatusByError(err), err.Error())
+	}
+	return urlToLinkResponse(url), nil
+}
+
+func getStatusByError(err error) codes.Code {
+	switch {
+	case errors.Is(err, app.ErrForbidden):
+		return codes.PermissionDenied
+	case errors.Is(err, app.ErrBadRequest):
+		return codes.InvalidArgument
+	default:
+		return codes.Internal
+	}
 }

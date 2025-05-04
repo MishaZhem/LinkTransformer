@@ -39,6 +39,7 @@ func generateShortKey(n int) string {
 }
 
 func (r *Program) GenerateLink(ctx context.Context, url string) (string, error) {
+	fmt.Print(1)
 	shortKey := generateShortKey(shortLinkLength)
 
 	err := r.repository.SaveLink(ctx, shortKey, url)
