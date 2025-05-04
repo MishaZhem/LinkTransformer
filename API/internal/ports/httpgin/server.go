@@ -1,6 +1,7 @@
 package httpgin
 
 import (
+	"LinkTransformer/internal/app"
 	"context"
 	"log"
 	"net/http"
@@ -10,12 +11,13 @@ import (
 )
 
 type Server struct {
+	app    app.App
 	server *http.Server
 }
 
-func NewHTTPServer(port string) Server {
+func NewHTTPServer(port string, a app.App) Server {
 	gin.SetMode(gin.ReleaseMode)
-	s := Server{}
+	s := Server{app: a}
 	s.server = &http.Server{
 		Addr:    port,
 		Handler: s.Handler(),
@@ -42,7 +44,7 @@ func (s *Server) Handler() http.Handler {
 	a := gin.New()
 	a.Use(CustomLogger)
 	a.Use(gin.Recovery())
-	AppRouter(&a.RouterGroup)
+	AppRouter(&a.RouterGroup, s.app)
 	return a
 }
 
