@@ -3,22 +3,36 @@ version: '3.8'
 services:
   postgres:
     container_name: postgres_container
-    image: postgres
+    image: postgres:15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    volumes:
-      - postgres:/var/lib/postgresql/data
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
     ports:
-      - "5433:5432"
+      - "5433:5432" 
     networks:
-      - postgres
+      - backend
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:5050"
+    networks:
+      - backend
     restart: unless-stopped
 
 networks:
-  postgres:
+  backend:
     driver: bridge
 
 volumes:
-  postgres:
-    driver: local
+  pgdata:

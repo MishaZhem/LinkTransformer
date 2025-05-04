@@ -39,15 +39,14 @@ func generateShortKey(n int) string {
 }
 
 func (r *Program) GenerateLink(ctx context.Context, url string) (string, error) {
-	fmt.Print(1)
 	shortKey := generateShortKey(shortLinkLength)
+	shortURL := fmt.Sprintf("http://localhost:8080/%s", shortKey)
 
-	err := r.repository.SaveLink(ctx, shortKey, url)
+	err := r.repository.SaveLink(ctx, shortURL, url)
 	if err != nil {
 		return "", err
 	}
 
-	shortURL := fmt.Sprintf("http://localhost:8080/%s", shortKey)
 	return shortURL, nil
 }
 

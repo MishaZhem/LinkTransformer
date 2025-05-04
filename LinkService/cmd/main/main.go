@@ -22,7 +22,7 @@ func main() {
 	logger.SetLevel(log.InfoLevel)
 	logger.SetFormatter(&log.TextFormatter{})
 
-	config, err := pgxpool.ParseConfig("postgres://postgres:postgres@localhost:5433/pg_course")
+	config, err := pgxpool.ParseConfig("postgres://postgres:123@localhost:5433/postgres")
 	if err != nil {
 		logger.WithError(err).Fatalf("can't parse pgxpool config")
 	}
