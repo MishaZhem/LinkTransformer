@@ -1,10 +1,13 @@
 package main
 
 import (
+	"LinkTransformer/internal/app"
+	grpcPort "LinkTransformer/internal/ports/grpc"
 	"LinkTransformer/internal/ports/httpgin"
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +15,8 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -30,8 +35,18 @@ func main() {
 		}
 	})
 
+	// connect to GRPC server
+	conn, err := grpc.DialContext(context.Background(), "localhost:1080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	linkServiceClientClient := grpcPort.NewLinkServiceClient(conn)
+
+	a := app.NewApp(linkServiceClientClient)
+
 	// start HTTP server
-	httpServer := httpgin.NewHTTPServer(":18080")
+	httpServer := httpgin.NewHTTPServer(":18080", a)
 
 	eg.Go(func() error {
 		fmt.Println("starting HTTP server")

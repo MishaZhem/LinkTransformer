@@ -4,7 +4,6 @@ import (
 	"LinkTransformer/internal/adapters/repository"
 	"context"
 	"errors"
-	"fmt"
 	"math/rand"
 	"strings"
 )
@@ -40,14 +39,13 @@ func generateShortKey(n int) string {
 
 func (r *Program) GenerateLink(ctx context.Context, url string) (string, error) {
 	shortKey := generateShortKey(shortLinkLength)
-	shortURL := fmt.Sprintf("http://localhost:8080/%s", shortKey)
 
-	err := r.repository.SaveLink(ctx, shortURL, url)
+	err := r.repository.SaveLink(ctx, shortKey, url)
 	if err != nil {
 		return "", err
 	}
 
-	return shortURL, nil
+	return shortKey, nil
 }
 
 func (r *Program) RedirectLink(ctx context.Context, key string) (string, error) {

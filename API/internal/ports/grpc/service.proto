@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package link;
+option go_package = "LinkService/internal/ports/grpc";
+
+service LinkService {
+  rpc GenerateLink(LinkRequest) returns (LinkResponse) {}
+  rpc RedirectLink(LinkRequest) returns (LinkResponse) {}
+}
+
+message LinkRequest {
+    string url = 1;
+}
+
+message LinkResponse {
+    string url = 1;
+}
