@@ -2,7 +2,9 @@ package main
 
 import (
 	"LinkTransformer/internal/app"
-	grpcPort "LinkTransformer/internal/ports/grpc"
+	grpcAnalyticsService "LinkTransformer/internal/ports/grpc/AnalyticsService"
+	grpcLinkService "LinkTransformer/internal/ports/grpc/LinkService"
+
 	"LinkTransformer/internal/ports/httpgin"
 	"context"
 	"errors"
@@ -41,9 +43,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	linkServiceClientClient := grpcPort.NewLinkServiceClient(conn)
+	linkServiceClientClient := grpcLinkService.NewLinkServiceClient(conn)
+	analyticsServiceClientClient := grpcAnalyticsService.NewAnalyticsServiceClient(conn)
 
-	a := app.NewApp(linkServiceClientClient)
+	a := app.NewApp(linkServiceClientClient, analyticsServiceClientClient)
 
 	// start HTTP server
 	httpServer := httpgin.NewHTTPServer(":18080", a)
