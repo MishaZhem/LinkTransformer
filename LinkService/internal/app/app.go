@@ -2,19 +2,22 @@ package app
 
 import (
 	"LinkTransformer/internal/adapters/repository"
+	"LinkTransformer/internal/ports/kafka"
 	"context"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strings"
 )
 
 type Program struct {
 	repository repository.Repository
+	producer   kafka.Producer
 }
 
 type App interface {
 	GenerateLink(ctx context.Context, url string) (string, error)
-	RedirectLink(ctx context.Context, url string) (string, error)
+	RedirectLink(ctx context.Context, url string, ipAddress string, userAgent string) (string, error)
 }
 
 var ErrBadRequest = errors.New("bad request")
@@ -23,9 +26,10 @@ var ErrForbidden = errors.New("forbidden")
 const shortLinkLength = 8
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-func NewApp(repository repository.Repository) App {
+func NewApp(repository repository.Repository, producer kafka.Producer) App {
 	return &Program{
 		repository: repository,
+		producer:   producer,
 	}
 }
 
@@ -48,10 +52,16 @@ func (r *Program) GenerateLink(ctx context.Context, url string) (string, error) 
 	return shortKey, nil
 }
 
-func (r *Program) RedirectLink(ctx context.Context, key string) (string, error) {
+func (r *Program) RedirectLink(ctx context.Context, key string, ipAddress string, userAgent string) (string, error) {
 	url, err := r.repository.GetOriginalURL(ctx, key)
 	if err != nil {
 		return "", err
 	}
+
+	err = r.producer.SendClickEvent(ctx, key, ipAddress, userAgent)
+	if err != nil {
+		fmt.Print("Error with Kafka\n")
+	}
+
 	return url, nil
 }

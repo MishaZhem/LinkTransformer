@@ -1,9 +1,10 @@
 package main
 
 import (
-	"LinkTransformer/internal/adapters/repository"
-	"LinkTransformer/internal/app"
-	grpcPort "LinkTransformer/internal/ports/grpc"
+	"AnalyticsService/internal/adapters/repository"
+	"AnalyticsService/internal/app"
+	grpcPort "AnalyticsService/internal/ports/grpc"
+	"AnalyticsService/internal/ports/kafka"
 	"context"
 	"fmt"
 	"net"
@@ -33,7 +34,18 @@ func main() {
 	}
 
 	repo := repository.NewRepository(pool, logger)
-	a := app.NewApp(repo)
+	consumer := kafka.NewConsumer(
+		[]string{"localhost:9092"},
+		"link-clicks",
+		"analytics-group",
+	)
+	defer consumer.Close()
+
+	a := app.NewApp(repo, consumer)
+
+	if err := a.RunConsumer(context.Background()); err != nil {
+		log.Fatalf("consumer failed: %v", err)
+	}
 
 	sigQuit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)

@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"LinkTransformer/internal/adapters/repository/queries"
+	"AnalyticsService/internal/adapters/repository/queries"
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"
@@ -23,7 +24,5 @@ func NewRepository(pgxPool *pgxpool.Pool, logger logrus.FieldLogger) Repository 
 }
 
 type Repository interface {
-	SaveLink(ctx context.Context, key string, originalURL string) error
-	GetOriginalURL(ctx context.Context, key string) (string, error)
-	GetKey(ctx context.Context, originalURL string) (string, error)
+	SaveClickEvent(ctx context.Context, key, ip, ua string, t time.Time) error
 }

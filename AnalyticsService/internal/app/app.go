@@ -1,57 +1,54 @@
 package app
 
 import (
-	"LinkTransformer/internal/adapters/repository"
+	"AnalyticsService/internal/adapters/repository"
+	"AnalyticsService/internal/ports/kafka"
 	"context"
+	"encoding/json"
 	"errors"
-	"math/rand"
-	"strings"
+	"log"
 )
 
 type Program struct {
 	repository repository.Repository
+	consumer   kafka.Consumer
 }
 
 type App interface {
-	GenerateLink(ctx context.Context, url string) (string, error)
-	RedirectLink(ctx context.Context, url string) (string, error)
+	GetStatistics(ctx context.Context, url string) (string, error)
+	RunConsumer(ctx context.Context) error
 }
 
 var ErrBadRequest = errors.New("bad request")
 var ErrForbidden = errors.New("forbidden")
 
-const shortLinkLength = 8
-const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-func NewApp(repository repository.Repository) App {
+func NewApp(repository repository.Repository, consumer kafka.Consumer) App {
 	return &Program{
 		repository: repository,
+		consumer:   consumer,
 	}
 }
 
-func generateShortKey(n int) string {
-	var sb strings.Builder
-	for i := 0; i < n; i++ {
-		sb.WriteByte(letters[rand.Intn(len(letters))])
-	}
-	return sb.String()
-}
-
-func (r *Program) GenerateLink(ctx context.Context, url string) (string, error) {
-	shortKey := generateShortKey(shortLinkLength)
-
-	err := r.repository.SaveLink(ctx, shortKey, url)
-	if err != nil {
-		return "", err
-	}
-
-	return shortKey, nil
-}
-
-func (r *Program) RedirectLink(ctx context.Context, key string) (string, error) {
-	url, err := r.repository.GetOriginalURL(ctx, key)
-	if err != nil {
-		return "", err
-	}
+func (r *Program) GetStatistics(ctx context.Context, url string) (string, error) {
 	return url, nil
+}
+
+func (r *Program) RunConsumer(ctx context.Context) error {
+	defer r.consumer.Close()
+	for {
+		m, err := r.consumer.ReadMessage(ctx)
+		if err != nil {
+			return err
+		}
+
+		var evt kafka.ClickEvent
+		if err := json.Unmarshal(m.Value, &evt); err != nil {
+			log.Printf("bad event: %v", err)
+			continue
+		}
+
+		if err := r.repository.SaveClickEvent(ctx, evt.LinkKey, evt.IP, evt.UserAgent, evt.Time); err != nil {
+			log.Printf("save error: %v", err)
+		}
+	}
 }

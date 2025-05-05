@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	status "google.golang.org/grpc/status"
 )
 
@@ -34,7 +35,18 @@ func (s *Server) GenerateLink(ctx context.Context, req *LinkRequest) (*LinkRespo
 }
 
 func (s *Server) RedirectLink(ctx context.Context, req *LinkRequest) (*LinkResponse, error) {
-	url, err := s.app.RedirectLink(ctx, req.Url)
+	md, _ := metadata.FromIncomingContext(ctx)
+	ips := md.Get("x-forwarded-for")
+	uas := md.Get("user-agent")
+	var ipAddress, userAgent string
+	if len(ips) > 0 {
+		ipAddress = ips[0]
+	}
+	if len(uas) > 0 {
+		userAgent = uas[0]
+	}
+
+	url, err := s.app.RedirectLink(ctx, req.Url, ipAddress, userAgent)
 	if err != nil {
 		return nil, status.Error(getStatusByError(err), err.Error())
 	}

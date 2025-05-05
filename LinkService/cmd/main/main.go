@@ -4,6 +4,7 @@ import (
 	"LinkTransformer/internal/adapters/repository"
 	"LinkTransformer/internal/app"
 	grpcPort "LinkTransformer/internal/ports/grpc"
+	"LinkTransformer/internal/ports/kafka"
 	"context"
 	"fmt"
 	"net"
@@ -33,7 +34,11 @@ func main() {
 	}
 
 	repo := repository.NewRepository(pool, logger)
-	a := app.NewApp(repo)
+	producer := kafka.NewProducer("localhost:9092", "analytics-topic")
+
+	defer producer.Close()
+
+	a := app.NewApp(repo, producer)
 
 	sigQuit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)

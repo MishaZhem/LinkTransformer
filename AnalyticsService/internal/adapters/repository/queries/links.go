@@ -2,57 +2,17 @@ package queries
 
 import (
 	"context"
-	"errors"
-
-	"github.com/jackc/pgx"
+	"time"
 )
 
-var (
-	ErrLinkNotFound = errors.New("link not found")
-)
+const saveClickEventQuery = `
+    INSERT INTO link_clicks (link_key, clicked_at, user_agent, ip_address)
+    VALUES ($1, $2, $3, $4)`
 
-const saveLinkQuery = `
-		INSERT INTO links (key, original_url)
-		VALUES ($1, $2)
-	`
+func (q *Queries) SaveClickEvent(ctx context.Context, key, ip, ua string, t time.Time) error {
 
-func (q *Queries) SaveLink(ctx context.Context, key string, originalURL string) error {
-	if _, err := q.pool.Exec(ctx, saveLinkQuery, key, originalURL); err != nil {
+	if _, err := q.pool.Exec(ctx, saveClickEventQuery, key, t, ua, ip); err != nil {
 		return err
 	}
 	return nil
-}
-
-const getOriginalUrlByKeyQuery = `SELECT original_url
-        FROM links
-        WHERE key = $1`
-
-func (q *Queries) GetOriginalURL(ctx context.Context, key string) (string, error) {
-	row := q.pool.QueryRow(ctx, getOriginalUrlByKeyQuery, key)
-
-	var originalURL string
-	if err := row.Scan(&originalURL); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return "", ErrLinkNotFound
-		}
-		return "", err
-	}
-	return originalURL, nil
-}
-
-const getKeyByOriginalUrlQuery = `SELECT key
-        FROM links
-        WHERE original_url = $1`
-
-func (q *Queries) GetKey(ctx context.Context, originalURL string) (string, error) {
-	row := q.pool.QueryRow(ctx, getKeyByOriginalUrlQuery, originalURL)
-
-	var key string
-	if err := row.Scan(&key); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return "", ErrLinkNotFound
-		}
-		return "", err
-	}
-	return key, nil
 }
