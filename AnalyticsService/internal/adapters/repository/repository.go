@@ -2,6 +2,7 @@ package repository
 
 import (
 	"AnalyticsService/internal/adapters/repository/queries"
+	"AnalyticsService/internal/ports/kafka"
 	"context"
 	"time"
 
@@ -25,4 +26,6 @@ func NewRepository(pgxPool *pgxpool.Pool, logger logrus.FieldLogger) Repository 
 
 type Repository interface {
 	SaveClickEvent(ctx context.Context, key, ip, ua string, t time.Time) error
+	GetClicks(ctx context.Context, key string) (int64, error)
+	GetRows(ctx context.Context, key string) ([]kafka.ClickEvent, error)
 }

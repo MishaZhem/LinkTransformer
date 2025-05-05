@@ -43,9 +43,7 @@ func main() {
 
 	a := app.NewApp(repo, consumer)
 
-	if err := a.RunConsumer(context.Background()); err != nil {
-		log.Fatalf("consumer failed: %v", err)
-	}
+	go a.RunConsumer(context.Background())
 
 	sigQuit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package analytics;
+option go_package = "AnalyticsService/internal/ports/grpc";
+
+service AnalyticsService {
+  rpc GetStatistics(LinkRequest) returns (ListStatisticsResponse) {}
+  rpc GetTotalClicks(LinkRequest) returns (GetTotalClicksResponse) {}
+}
+
+message LinkRequest {
+    string url = 1;
+}
+
+message StatisticsResponse {
+    string url = 1;
+    string IP = 2;
+    string UserAgent = 3;
+    string Time = 4;
+}
+
+message ListStatisticsResponse {
+  repeated StatisticsResponse list = 1;
+}
+
+
+message GetTotalClicksResponse {
+    int64 total_clicks = 1;
+}

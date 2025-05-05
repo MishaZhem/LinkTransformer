@@ -15,7 +15,8 @@ type Program struct {
 }
 
 type App interface {
-	GetStatistics(ctx context.Context, url string) (string, error)
+	GetStatistics(ctx context.Context, url string) ([]kafka.ClickEvent, error)
+	GetTotalClicks(ctx context.Context, url string) (int64, error)
 	RunConsumer(ctx context.Context) error
 }
 
@@ -29,8 +30,22 @@ func NewApp(repository repository.Repository, consumer kafka.Consumer) App {
 	}
 }
 
-func (r *Program) GetStatistics(ctx context.Context, url string) (string, error) {
-	return url, nil
+func (r *Program) GetStatistics(ctx context.Context, url string) ([]kafka.ClickEvent, error) {
+	events, err := r.repository.GetRows(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
+
+func (r *Program) GetTotalClicks(ctx context.Context, url string) (int64, error) {
+	clicks, err := r.repository.GetClicks(ctx, url)
+	if err != nil {
+		return 0, err
+	}
+
+	return clicks, nil
 }
 
 func (r *Program) RunConsumer(ctx context.Context) error {
