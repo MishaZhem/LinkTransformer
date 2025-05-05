@@ -1,38 +1,70 @@
 version: '3.8'
 
 services:
-  postgres:
-    container_name: postgres_container
+  # PostgreSQL для AnalyticsService
+  analytics_postgres:
+    container_name: analytics_postgres_container
     image: postgres:15
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: analytics
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
     ports:
-      - "5433:5432" 
+      - "5444:5432"
     networks:
-      - backend
+      - analytics_net
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - analytics_pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
-  pgadmin:
-    container_name: pgadmin_container
+  # pgAdmin (отдельный порт)
+  analytics_pgadmin:
+    container_name: analytics_pgadmin_container
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_EMAIL: analytics@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - "5050:5050"
+      - "5150:5050" 
     networks:
-      - backend
+      - analytics_net
+    restart: unless-stopped
+
+  # Zookeeper
+  analytics_zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2182 
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2182:2182"
+    networks:
+      - analytics_net
+    restart: unless-stopped
+
+  # Kafka
+  analytics_kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    depends_on:
+      - analytics_zookeeper
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: analytics_zookeeper:2182
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://analytics_kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - analytics_net
     restart: unless-stopped
 
 networks:
-  backend:
+  analytics_net:
     driver: bridge
 
 volumes:
-  pgdata:
+  analytics_pgdata:
