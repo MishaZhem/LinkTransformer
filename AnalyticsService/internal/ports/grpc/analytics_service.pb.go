@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v4.25.3
-// source: service.proto
+// source: analytics_service.proto
 
 package grpc
 
@@ -30,7 +30,7 @@ type LinkRequest struct {
 
 func (x *LinkRequest) Reset() {
 	*x = LinkRequest{}
-	mi := &file_service_proto_msgTypes[0]
+	mi := &file_analytics_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *LinkRequest) String() string {
 func (*LinkRequest) ProtoMessage() {}
 
 func (x *LinkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[0]
+	mi := &file_analytics_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *LinkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkRequest.ProtoReflect.Descriptor instead.
 func (*LinkRequest) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{0}
+	return file_analytics_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LinkRequest) GetUrl() string {
@@ -77,7 +77,7 @@ type StatisticsResponse struct {
 
 func (x *StatisticsResponse) Reset() {
 	*x = StatisticsResponse{}
-	mi := &file_service_proto_msgTypes[1]
+	mi := &file_analytics_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -89,7 +89,7 @@ func (x *StatisticsResponse) String() string {
 func (*StatisticsResponse) ProtoMessage() {}
 
 func (x *StatisticsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[1]
+	mi := &file_analytics_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -102,7 +102,7 @@ func (x *StatisticsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatisticsResponse.ProtoReflect.Descriptor instead.
 func (*StatisticsResponse) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{1}
+	return file_analytics_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *StatisticsResponse) GetUrl() string {
@@ -142,7 +142,7 @@ type ListStatisticsResponse struct {
 
 func (x *ListStatisticsResponse) Reset() {
 	*x = ListStatisticsResponse{}
-	mi := &file_service_proto_msgTypes[2]
+	mi := &file_analytics_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -154,7 +154,7 @@ func (x *ListStatisticsResponse) String() string {
 func (*ListStatisticsResponse) ProtoMessage() {}
 
 func (x *ListStatisticsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[2]
+	mi := &file_analytics_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -167,7 +167,7 @@ func (x *ListStatisticsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStatisticsResponse.ProtoReflect.Descriptor instead.
 func (*ListStatisticsResponse) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{2}
+	return file_analytics_service_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListStatisticsResponse) GetList() []*StatisticsResponse {
@@ -186,7 +186,7 @@ type GetTotalClicksResponse struct {
 
 func (x *GetTotalClicksResponse) Reset() {
 	*x = GetTotalClicksResponse{}
-	mi := &file_service_proto_msgTypes[3]
+	mi := &file_analytics_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -198,7 +198,7 @@ func (x *GetTotalClicksResponse) String() string {
 func (*GetTotalClicksResponse) ProtoMessage() {}
 
 func (x *GetTotalClicksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_proto_msgTypes[3]
+	mi := &file_analytics_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -211,7 +211,7 @@ func (x *GetTotalClicksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTotalClicksResponse.ProtoReflect.Descriptor instead.
 func (*GetTotalClicksResponse) Descriptor() ([]byte, []int) {
-	return file_service_proto_rawDescGZIP(), []int{3}
+	return file_analytics_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetTotalClicksResponse) GetTotalClicks() int64 {
@@ -221,11 +221,11 @@ func (x *GetTotalClicksResponse) GetTotalClicks() int64 {
 	return 0
 }
 
-var File_service_proto protoreflect.FileDescriptor
+var File_analytics_service_proto protoreflect.FileDescriptor
 
-const file_service_proto_rawDesc = "" +
+const file_analytics_service_proto_rawDesc = "" +
 	"\n" +
-	"\rservice.proto\x12\tanalytics\"\x1f\n" +
+	"\x17analytics_service.proto\x12\tanalytics\"\x1f\n" +
 	"\vLinkRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\"h\n" +
 	"\x12StatisticsResponse\x12\x10\n" +
@@ -242,25 +242,25 @@ const file_service_proto_rawDesc = "" +
 	"\x0eGetTotalClicks\x12\x16.analytics.LinkRequest\x1a!.analytics.GetTotalClicksResponse\"\x00B&Z$AnalyticsService/internal/ports/grpcb\x06proto3"
 
 var (
-	file_service_proto_rawDescOnce sync.Once
-	file_service_proto_rawDescData []byte
+	file_analytics_service_proto_rawDescOnce sync.Once
+	file_analytics_service_proto_rawDescData []byte
 )
 
-func file_service_proto_rawDescGZIP() []byte {
-	file_service_proto_rawDescOnce.Do(func() {
-		file_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_service_proto_rawDesc), len(file_service_proto_rawDesc)))
+func file_analytics_service_proto_rawDescGZIP() []byte {
+	file_analytics_service_proto_rawDescOnce.Do(func() {
+		file_analytics_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_analytics_service_proto_rawDesc), len(file_analytics_service_proto_rawDesc)))
 	})
-	return file_service_proto_rawDescData
+	return file_analytics_service_proto_rawDescData
 }
 
-var file_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_service_proto_goTypes = []any{
+var file_analytics_service_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_analytics_service_proto_goTypes = []any{
 	(*LinkRequest)(nil),            // 0: analytics.LinkRequest
 	(*StatisticsResponse)(nil),     // 1: analytics.StatisticsResponse
 	(*ListStatisticsResponse)(nil), // 2: analytics.ListStatisticsResponse
 	(*GetTotalClicksResponse)(nil), // 3: analytics.GetTotalClicksResponse
 }
-var file_service_proto_depIdxs = []int32{
+var file_analytics_service_proto_depIdxs = []int32{
 	1, // 0: analytics.ListStatisticsResponse.list:type_name -> analytics.StatisticsResponse
 	0, // 1: analytics.AnalyticsService.GetStatistics:input_type -> analytics.LinkRequest
 	0, // 2: analytics.AnalyticsService.GetTotalClicks:input_type -> analytics.LinkRequest
@@ -273,26 +273,26 @@ var file_service_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_service_proto_init() }
-func file_service_proto_init() {
-	if File_service_proto != nil {
+func init() { file_analytics_service_proto_init() }
+func file_analytics_service_proto_init() {
+	if File_analytics_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_proto_rawDesc), len(file_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_analytics_service_proto_rawDesc), len(file_analytics_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_service_proto_goTypes,
-		DependencyIndexes: file_service_proto_depIdxs,
-		MessageInfos:      file_service_proto_msgTypes,
+		GoTypes:           file_analytics_service_proto_goTypes,
+		DependencyIndexes: file_analytics_service_proto_depIdxs,
+		MessageInfos:      file_analytics_service_proto_msgTypes,
 	}.Build()
-	File_service_proto = out.File
-	file_service_proto_goTypes = nil
-	file_service_proto_depIdxs = nil
+	File_analytics_service_proto = out.File
+	file_analytics_service_proto_goTypes = nil
+	file_analytics_service_proto_depIdxs = nil
 }

@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL для AnalyticsService
   analytics_postgres:
     container_name: analytics_postgres_container
     image: postgres:15
@@ -18,7 +17,6 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
-  # pgAdmin (отдельный порт)
   analytics_pgadmin:
     container_name: analytics_pgadmin_container
     image: dpage/pgadmin4
@@ -32,7 +30,6 @@ services:
       - analytics_net
     restart: unless-stopped
 
-  # Zookeeper
   analytics_zookeeper:
     image: confluentinc/cp-zookeeper:7.2.1
     environment:
@@ -44,17 +41,16 @@ services:
       - analytics_net
     restart: unless-stopped
 
-  # Kafka
   analytics_kafka:
     image: confluentinc/cp-kafka:7.2.1
     depends_on:
       - analytics_zookeeper
     ports:
-      - "9093:9092"
+      - "9093:9093"
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: analytics_zookeeper:2182
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://analytics_kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://analytics_kafka:9093,PLAINTEXT_HOST://localhost:29093 
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1

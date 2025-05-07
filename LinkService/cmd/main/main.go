@@ -53,7 +53,7 @@ func main() {
 			return nil
 		}
 	})
-	lis, err := net.Listen("tcp", ":1080")
+	lis, err := net.Listen("tcp", ":10800")
 	if err != nil {
 		fmt.Printf("can't create listener: %s\n", err.Error())
 		return

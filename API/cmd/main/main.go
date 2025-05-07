@@ -37,14 +37,20 @@ func main() {
 		}
 	})
 
-	// connect to GRPC server
-	conn, err := grpc.DialContext(context.Background(), "localhost:1080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// connect to GRPC AnalyticsServer
+	connAnalytics, err := grpc.DialContext(context.Background(), "localhost:1080", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	linkServiceClientClient := grpcLinkService.NewLinkServiceClient(conn)
-	analyticsServiceClientClient := grpcAnalyticsService.NewAnalyticsServiceClient(conn)
+	// connect to GRPC AnalyticsServer
+	connLink, err := grpc.DialContext(context.Background(), "localhost:10800", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	linkServiceClientClient := grpcLinkService.NewLinkServiceClient(connLink)
+	analyticsServiceClientClient := grpcAnalyticsService.NewAnalyticsServiceClient(connAnalytics)
 
 	a := app.NewApp(linkServiceClientClient, analyticsServiceClientClient)
 
