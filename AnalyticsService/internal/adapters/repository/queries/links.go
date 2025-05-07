@@ -25,7 +25,7 @@ func (q *Queries) SaveClickEvent(ctx context.Context, key, ip, ua string, t time
 	return nil
 }
 
-const getClicksByKeyQuery = `SELECT COUNT(*) WHERE link_key = $1`
+const getClicksByKeyQuery = `SELECT COUNT(*) FROM link_clicks WHERE link_key = $1`
 
 func (q *Queries) GetClicks(ctx context.Context, key string) (int64, error) {
 	row := q.pool.QueryRow(ctx, getClicksByKeyQuery, key)
@@ -40,7 +40,7 @@ func (q *Queries) GetClicks(ctx context.Context, key string) (int64, error) {
 	return res, nil
 }
 
-const getRowsByKeyQuery = `SELECT COUNT(*) WHERE link_key = $1`
+const getRowsByKeyQuery = `SELECT COUNT(*) FROM link_clicks WHERE link_key = $1`
 
 func (q *Queries) GetRows(ctx context.Context, key string) ([]kafka.ClickEvent, error) {
 	rows, err := q.pool.Query(ctx, getRowsByKeyQuery, key)
