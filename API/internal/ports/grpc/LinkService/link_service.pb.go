@@ -4,7 +4,7 @@
 // 	protoc        v4.25.3
 // source: link_service.proto
 
-package grpc
+package link_service
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

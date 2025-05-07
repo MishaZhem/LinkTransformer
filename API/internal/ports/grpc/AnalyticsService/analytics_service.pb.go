@@ -4,7 +4,7 @@
 // 	protoc        v4.25.3
 // source: analytics_service.proto
 
-package grpc
+package analytics_service
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

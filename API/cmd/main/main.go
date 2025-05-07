@@ -43,7 +43,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// connect to GRPC AnalyticsServer
+	// connect to GRPC LinkServer
 	connLink, err := grpc.DialContext(context.Background(), "localhost:10800", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
