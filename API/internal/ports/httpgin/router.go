@@ -7,6 +7,8 @@ import (
 )
 
 func AppRouter(r *gin.RouterGroup, a app.App) {
-	r.GET("/shorter/:link", generateLink(a)) // Метод для получения главной страницы
-	r.GET("/:link", redirectLink(a))         // Метод для получения главной страницы
+	r.GET("/shorter/:link", generateLink(a))
+	r.GET("/:link", redirectLink(a))
+	r.GET("/stats/:link", getStatistic(a))
+	r.GET("/clicks/:link", getTotalClicks(a))
 }

@@ -37,6 +37,37 @@ func redirectLink(a app.App) gin.HandlerFunc {
 	}
 }
 
+func getStatistic(a app.App) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		link := c.Param("link")
+
+		url, err := a.GetStatistics(context.Background(), link)
+		if err != nil {
+			getStatusByError(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, LinkSuccessResponse(url))
+	}
+}
+
+func getTotalClicks(a app.App) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		link := c.Param("link")
+
+		clicks, err := a.GetTotalClicks(context.Background(), link)
+		if err != nil {
+			getStatusByError(c, err)
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data":  clicks,
+			"error": nil,
+		})
+	}
+}
+
 func getStatusByError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, app.ErrForbidden):

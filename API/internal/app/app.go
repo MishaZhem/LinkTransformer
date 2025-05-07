@@ -17,6 +17,8 @@ type Program struct {
 type App interface {
 	GenerateLink(ctx context.Context, url string) (string, error)
 	RedirectLink(ctx context.Context, url string) (string, error)
+	GetStatistics(ctx context.Context, url string) (string, error)
+	GetTotalClicks(ctx context.Context, url string) (int64, error)
 }
 
 var ErrBadRequest = errors.New("bad request")
