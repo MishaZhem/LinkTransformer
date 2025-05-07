@@ -144,6 +144,29 @@ services:
       - backend
     restart: unless-stopped
 
+  analyticsservice:
+    build:
+      context: ./AnalyticsService
+    ports:
+      - "1080:1080"
+    depends_on:
+      - analytics_postgres
+    networks:
+      - backend
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./API
+    ports:
+      - "18080:18080"
+    depends_on:
+      - linkservice
+      - analyticsservice
+    networks:
+      - backend
+    restart: unless-stopped
+
 networks:
   backend:
     driver: bridge

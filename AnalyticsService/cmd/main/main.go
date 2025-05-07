@@ -23,7 +23,7 @@ func main() {
 	logger.SetLevel(log.InfoLevel)
 	logger.SetFormatter(&log.TextFormatter{})
 
-	config, err := pgxpool.ParseConfig("postgres://postgres:123@localhost:5444/analytics")
+	config, err := pgxpool.ParseConfig("postgres://postgres:123@analytics_postgres:5432/analytics")
 	if err != nil {
 		logger.WithError(err).Fatalf("can't parse pgxpool config")
 	}
@@ -35,7 +35,7 @@ func main() {
 
 	repo := repository.NewRepository(pool, logger)
 	consumer := kafka.NewConsumer(
-		[]string{"localhost:9092"},
+		[]string{"kafka:19092"},
 		"analytics",
 		"analytics-group",
 	)

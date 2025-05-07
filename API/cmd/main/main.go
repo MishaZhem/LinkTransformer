@@ -38,13 +38,13 @@ func main() {
 	})
 
 	// connect to GRPC AnalyticsServer
-	connAnalytics, err := grpc.DialContext(context.Background(), "localhost:1080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connAnalytics, err := grpc.DialContext(context.Background(), "analyticsservice:1080", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// connect to GRPC LinkServer
-	connLink, err := grpc.DialContext(context.Background(), "localhost:10800", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	connLink, err := grpc.DialContext(context.Background(), "linkservice:10800", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
