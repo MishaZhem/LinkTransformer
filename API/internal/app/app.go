@@ -3,7 +3,6 @@ package app
 import (
 	grpcAnalyticsService "LinkTransformer/internal/ports/grpc/AnalyticsService"
 	grpcLinkService "LinkTransformer/internal/ports/grpc/LinkService"
-	"encoding/json"
 
 	"context"
 	"errors"
@@ -17,7 +16,7 @@ type Program struct {
 type App interface {
 	GenerateLink(ctx context.Context, url string) (string, error)
 	RedirectLink(ctx context.Context, url string) (string, error)
-	GetStatistics(ctx context.Context, url string) (string, error)
+	GetStatistics(ctx context.Context, url string) ([]*ClickEvent, error)
 	GetTotalClicks(ctx context.Context, url string) (int64, error)
 }
 
@@ -48,23 +47,18 @@ func (r *Program) RedirectLink(ctx context.Context, key string) (string, error) 
 	return link.Url, nil
 }
 
-func (r *Program) GetStatistics(ctx context.Context, url string) (string, error) {
+func (r *Program) GetStatistics(ctx context.Context, url string) ([]*ClickEvent, error) {
 	events, err := r.analyticsService.GetStatistics(ctx, &grpcAnalyticsService.LinkRequest{
 		Url: url,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	result := make([]*ClickEvent, 0)
 	for _, row := range events.List {
 		result = append(result, statisticsResponseToRow(row))
 	}
-	jsonBytes, err := json.Marshal(result)
-	if err != nil {
-		return "", err
-	}
-	jsonString := string(jsonBytes)
-	return jsonString, nil
+	return result, nil
 }
 
 func (r *Program) GetTotalClicks(ctx context.Context, url string) (int64, error) {

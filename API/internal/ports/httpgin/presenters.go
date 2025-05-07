@@ -1,6 +1,8 @@
 package httpgin
 
 import (
+	"LinkTransformer/internal/app"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +15,13 @@ func LinkSuccessResponse(link string) gin.H {
 		"data": linkResponse{
 			Link: link,
 		},
+		"error": nil,
+	}
+}
+
+func ClickEventSuccessResponse(values []*app.ClickEvent) gin.H {
+	return gin.H{
+		"data":  values,
 		"error": nil,
 	}
 }

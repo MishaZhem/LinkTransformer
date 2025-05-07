@@ -41,13 +41,13 @@ func getStatistic(a app.App) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		link := c.Param("link")
 
-		url, err := a.GetStatistics(context.Background(), link)
+		events, err := a.GetStatistics(context.Background(), link)
 		if err != nil {
 			getStatusByError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, LinkSuccessResponse(url))
+		c.JSON(http.StatusOK, ClickEventSuccessResponse(events))
 	}
 }
 
