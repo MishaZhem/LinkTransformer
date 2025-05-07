@@ -23,7 +23,8 @@ func main() {
 	logger.SetLevel(log.InfoLevel)
 	logger.SetFormatter(&log.TextFormatter{})
 
-	config, err := pgxpool.ParseConfig("postgres://postgres:123@localhost:5433/postgres")
+	config, err := pgxpool.ParseConfig("postgres://postgres:123@link_postgres_container:5432/postgres")
+
 	if err != nil {
 		logger.WithError(err).Fatalf("can't parse pgxpool config")
 	}
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	repo := repository.NewRepository(pool, logger)
-	producer := kafka.NewProducer("localhost:9092", "analytics")
+	producer := kafka.NewProducer("kafka:19092", "analytics")
 
 	defer producer.Close()
 

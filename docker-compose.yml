@@ -132,6 +132,17 @@ services:
       "
     networks:
       - backend
+  
+  linkservice:
+    build:
+      context: ./LinkService
+    ports:
+      - "10800:10800"
+    depends_on:
+      - link_postgres
+    networks:
+      - backend
+    restart: unless-stopped
 
 networks:
   backend:
