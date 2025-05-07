@@ -4,6 +4,7 @@ import (
 	"AnalyticsService/internal/ports/kafka"
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx"
@@ -29,7 +30,7 @@ const getClicksByKeyQuery = `SELECT COUNT(*) FROM link_clicks WHERE link_key = $
 
 func (q *Queries) GetClicks(ctx context.Context, key string) (int64, error) {
 	row := q.pool.QueryRow(ctx, getClicksByKeyQuery, key)
-
+	fmt.Print(row)
 	var res int64
 	if err := row.Scan(&res); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -40,7 +41,7 @@ func (q *Queries) GetClicks(ctx context.Context, key string) (int64, error) {
 	return res, nil
 }
 
-const getRowsByKeyQuery = `SELECT COUNT(*) FROM link_clicks WHERE link_key = $1`
+const getRowsByKeyQuery = `SELECT link_key, ip_address, user_agent, clicked_at FROM link_clicks WHERE link_key = $1`
 
 func (q *Queries) GetRows(ctx context.Context, key string) ([]kafka.ClickEvent, error) {
 	rows, err := q.pool.Query(ctx, getRowsByKeyQuery, key)
