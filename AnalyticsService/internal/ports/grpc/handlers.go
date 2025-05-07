@@ -32,7 +32,7 @@ func (s *Server) GetStatistics(ctx context.Context, req *LinkRequest) (*ListStat
 	return &ListStatisticsResponse{List: result}, nil
 }
 
-func (s *Server) RedirectLink(ctx context.Context, req *LinkRequest) (*GetTotalClicksResponse, error) {
+func (s *Server) GetTotalClicks(ctx context.Context, req *LinkRequest) (*GetTotalClicksResponse, error) {
 	clicks, err := s.app.GetTotalClicks(ctx, req.Url)
 	if err != nil {
 		return nil, status.Error(getStatusByError(err), err.Error())

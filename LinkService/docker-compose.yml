@@ -46,8 +46,8 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"       # доступ из хоста на PLAINTEXT_HOST
-      - "19092:19092"     # внутренний порт для PLAINTEXT
+      - "9092:9092"
+      - "19092:19092"  
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -55,6 +55,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - backend
     restart: unless-stopped

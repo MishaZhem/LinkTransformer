@@ -5,7 +5,7 @@ import (
 	"LinkTransformer/internal/ports/kafka"
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 )
@@ -60,7 +60,8 @@ func (r *Program) RedirectLink(ctx context.Context, key string, ipAddress string
 
 	err = r.producer.SendClickEvent(ctx, key, ipAddress, userAgent)
 	if err != nil {
-		fmt.Print("Error with Kafka\n")
+		// fmt.Print("Error with Kafka: \n")
+		log.Println("Error with Kafka:", err)
 	}
 
 	return url, nil

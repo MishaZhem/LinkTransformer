@@ -34,7 +34,7 @@ func main() {
 	}
 
 	repo := repository.NewRepository(pool, logger)
-	producer := kafka.NewProducer("localhost:9092", "analytics-topic")
+	producer := kafka.NewProducer("localhost:9092", "analytics")
 
 	defer producer.Close()
 

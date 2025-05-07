@@ -10,104 +10,133 @@ services:
       - "2181:2181"
     networks:
       - backend
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - "9092:9092"   
+      - "19092:19092" 
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    command: >
+      bash -c "
+        /etc/confluent/docker/run & 
+        echo 'Waiting for Kafka startup...'; sleep 15; 
+        kafka-topics --create --topic analytics --bootstrap-server kafka:19092 --replication-factor 1 --partitions 1 || true; 
+        wait
+      "
     networks:
       - backend
+    restart: unless-stopped
+    
 
-  postgres:
+  link_postgres:
+    container_name: link_postgres_container
     image: postgres:15
-    container_name: link_postgres
     environment:
-      POSTGRES_DB: linkdb
+      POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
     ports:
       - "5433:5432"
+    networks:
+      - backend
     volumes:
       - link_pgdata:/var/lib/postgresql/data
-    networks:
-      - backend
+      - ./link/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
 
-  analytics_postgres:
-    image: postgres:15
-    container_name: analytics_postgres
-    environment:
-      POSTGRES_DB: analytics
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-    ports:
-      - "5444:5432"
-    volumes:
-      - analytics_pgdata:/var/lib/postgresql/data
-    networks:
-      - backend
-
-  pgadmin:
+  link_pgadmin:
+    container_name: link_pgadmin_container
     image: dpage/pgadmin4
-    container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_EMAIL: link@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:5050"
     networks:
       - backend
+    restart: unless-stopped
 
-  api:
-    build:
-      context: ./api
-    depends_on:
-      - linkservice
-      - analyticsservice
-      - kafka
-    ports:
-      - "8080:8080"
-    networks:
-      - backend
-
-  linkservice:
-    build:
-      context: ./LinkService
-    depends_on:
-      - postgres
-    ports:
-      - "8081:8081"
-    networks:
-      - backend
+  analytics_postgres:
+    container_name: analytics_postgres_container
+    image: postgres:15
     environment:
-      DATABASE_URL: postgres://postgres:123@postgres:5432/linkdb?sslmode=disable
+      POSTGRES_DB: analytics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5444:5432"
+    networks:
+      - backend
+    volumes:
+      - analytics_pgdata:/var/lib/postgresql/data
+      - ./analytics/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
 
-  analyticsservice:
-    build:
-      context: ./LinkService
+  analytics_pgadmin:
+    container_name: analytics_pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: analytics@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5150:5050"
+    networks:
+      - backend
+    restart: unless-stopped
+  
+  link_migrator:
+    image: postgres:15
+    depends_on:
+      - link_postgres
+    environment:
+      PGPASSWORD: 123
+    volumes:
+      - ./LinkService/internal/migrators:/migrations
+    entrypoint: >
+      bash -c "
+      until pg_isready -h link_postgres_container -p 5432 -U postgres; do
+        echo 'Waiting for link_postgres...'; sleep 2;
+      done;
+      psql -h link_postgres_container -U postgres -d postgres -f /migrations/001_links_table.up.sql
+      "
+    networks:
+      - backend
+
+  analytics_migrator:
+    image: postgres:15
     depends_on:
       - analytics_postgres
-      - kafka
-    ports:
-      - "8082:8082"
+    environment:
+      PGPASSWORD: 123
+    volumes:
+      - ./AnalyticsService/internal/migrators:/migrations
+    entrypoint: >
+      bash -c "
+      until pg_isready -h analytics_postgres_container -p 5432 -U postgres; do
+        echo 'Waiting for analytics_postgres...'; sleep 2;
+      done;
+      psql -h analytics_postgres_container -U postgres -d analytics -f /migrations/001_links_clicks_table.up.sql
+      "
     networks:
       - backend
-    environment:
-      DATABASE_URL: postgres://postgres:123@analytics_postgres:5432/analytics?sslmode=disable
-
-volumes:
-  link_pgdata:
-  analytics_pgdata:
 
 networks:
   backend:
     driver: bridge
+
+volumes:
+  link_pgdata:
+  analytics_pgdata:
