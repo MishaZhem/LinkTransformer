@@ -13,9 +13,11 @@
 
 ## Запуск
 
-Вводим в папке проекта команду:
-
+```
+go get github.com/MishaZhem/LinkTransformer
+cd LinkTransformer
 docker compose up --build
+```
 
 Подключаемся к localhost:18080
 
