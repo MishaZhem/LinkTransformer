@@ -50,9 +50,11 @@ func (r *Program) GetTotalClicks(ctx context.Context, url string) (int64, error)
 
 func (r *Program) RunConsumer(ctx context.Context) error {
 	defer r.consumer.Close()
+	log.Println("Kafka consumer loop starting...")
 	for {
 		m, err := r.consumer.ReadMessage(ctx)
 		if err != nil {
+			log.Println("Kafka consumer stopped by context")
 			return err
 		}
 

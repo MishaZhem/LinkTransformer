@@ -140,6 +140,7 @@ services:
       - "10800:10800"
     depends_on:
       - link_postgres
+      - kafka
     networks:
       - backend
     restart: unless-stopped
@@ -151,6 +152,7 @@ services:
       - "1080:1080"
     depends_on:
       - analytics_postgres
+      - kafka
     networks:
       - backend
     restart: unless-stopped
