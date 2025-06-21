@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   zookeeper:
@@ -17,8 +17,8 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"   
-      - "19092:19092" 
+      - "9092:9092"
+      - "19092:19092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -30,14 +30,13 @@ services:
     command: >
       bash -c "
         /etc/confluent/docker/run & 
-        echo 'Waiting for Kafka startup...'; sleep 15; 
+        echo 'Waiting for Kafka startup...'; sleep 2; 
         kafka-topics --create --topic analytics --bootstrap-server kafka:19092 --replication-factor 1 --partitions 1 || true; 
         wait
       "
     networks:
       - backend
     restart: unless-stopped
-    
 
   link_postgres:
     container_name: link_postgres_container
@@ -61,7 +60,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: link@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:5050"
     networks:
@@ -90,13 +89,13 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: analytics@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5150:5050"
     networks:
       - backend
     restart: unless-stopped
-  
+
   link_migrator:
     image: postgres:15
     depends_on:
@@ -132,7 +131,7 @@ services:
       "
     networks:
       - backend
-  
+
   linkservice:
     build:
       context: ./LinkService

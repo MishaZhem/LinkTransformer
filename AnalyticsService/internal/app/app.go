@@ -54,7 +54,7 @@ func (r *Program) RunConsumer(ctx context.Context) error {
 	for {
 		m, err := r.consumer.ReadMessage(ctx)
 		if err != nil {
-			log.Println("Kafka consumer stopped by context")
+			log.Printf("Kafka consumer error: %v\n", err)
 			return err
 		}
 
@@ -63,7 +63,7 @@ func (r *Program) RunConsumer(ctx context.Context) error {
 			log.Printf("bad event: %v", err)
 			continue
 		}
-
+		log.Printf("Saved click: %+v", evt)
 		if err := r.repository.SaveClickEvent(ctx, evt.LinkKey, evt.IP, evt.UserAgent, evt.Time); err != nil {
 			log.Printf("save error: %v", err)
 		}

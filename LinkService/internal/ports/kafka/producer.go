@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -26,9 +27,11 @@ type Producer interface {
 
 func NewProducer(broker, topic string) Producer {
 	writer := &kafka.Writer{
-		Addr:     kafka.TCP(broker),
-		Topic:    topic,
-		Balancer: &kafka.LeastBytes{},
+		Addr:         kafka.TCP(broker),
+		Topic:        topic,
+		Balancer:     &kafka.LeastBytes{},
+		BatchTimeout: 10 * time.Millisecond,
+		RequiredAcks: kafka.RequireOne,
 	}
 
 	return &KafkaProducer{writer: writer}
@@ -47,7 +50,9 @@ func (p *KafkaProducer) SendClickEvent(ctx context.Context, key, ipAddress, user
 		return err
 	}
 
+	log.Printf("Sending to Kafka: %s", string(data))
 	err = p.writer.WriteMessages(ctx, kafka.Message{Value: data})
+	log.Printf("Sent to Kafka, err: %v", err)
 	if err != nil {
 		return err
 	}
